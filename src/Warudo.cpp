@@ -8,6 +8,10 @@ using namespace geode::prelude;
 static bool g_frozen = false;
 
 class $modify(WarudoPlayLayer, PlayLayer) {
+    struct Fields {
+        CCMenuItemSpriteExtra* m_unfreezeBtn = nullptr;
+    };
+
     void setupHasCompleted() {
         PlayLayer::setupHasCompleted();
         g_frozen = false;
@@ -23,7 +27,7 @@ class $modify(WarudoPlayLayer, PlayLayer) {
         menu->setPosition({40.f, 40.f});
         btn->setVisible(false);
         this->addChild(menu, 1000);
-        this->m_fields->m_unfreezeBtn = btn;
+        m_fields->m_unfreezeBtn = btn;
     }
 
     void update(float dt) {
@@ -33,7 +37,7 @@ class $modify(WarudoPlayLayer, PlayLayer) {
 
     void onUnfreeze(CCObject*) {
         g_frozen = false;
-        this->m_fields->m_unfreezeBtn->setVisible(false);
+        if (m_fields->m_unfreezeBtn) m_fields->m_unfreezeBtn->setVisible(false);
     }
 };
 
@@ -55,9 +59,14 @@ class $modify(WarudoPauseLayer, PauseLayer) {
 
     void onWarudo(CCObject*) {
         g_frozen = true;
+
+        // mostra o botão de descongelar na fase
         if (auto play = PlayLayer::get()) {
-            if (play->m_fields) {}
+            if (auto m = static_cast<WarudoPlayLayer*>(play)->m_fields->m_unfreezeBtn) {
+                m->setVisible(true);
+            }
         }
+
         this->onResume(nullptr);
     }
 };
