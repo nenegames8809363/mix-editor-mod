@@ -1,7 +1,18 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PauseLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
+
+// level da fase que tá rodando, salvo quando a fase carrega
+static GJGameLevel* g_mixLevel = nullptr;
+
+class $modify(MixPlayLayer, PlayLayer) {
+    void setupHasCompleted() {
+        PlayLayer::setupHasCompleted();
+        g_mixLevel = m_level;
+    }
+};
 
 class $modify(MixPauseLayer, PauseLayer) {
     void customSetup() {
@@ -20,7 +31,14 @@ class $modify(MixPauseLayer, PauseLayer) {
     }
 
     void onMix(CCObject*) {
-        // TODO: pausar, guardar o estado e abrir o LevelEditorLayer
-        FLAlertLayer::create("Mix Editor", "Botão funcionando!", "OK")->show();
+        if (!g_mixLevel) {
+            FLAlertLayer::create("Mix Editor", "Level não encontrado.", "OK")->show();
+            return;
+        }
+
+        auto scene = LevelEditorLayer::scene(g_mixLevel);
+        CCDirector::sharedDirector()->replaceScene(
+            CCTransitionFade::create(0.5f, scene)
+        );
     }
 };
