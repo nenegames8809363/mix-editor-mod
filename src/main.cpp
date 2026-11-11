@@ -36,7 +36,7 @@ class $modify(MixPauseLayer, PauseLayer) {
             return;
         }
 
-        auto scene = LevelEditorLayer::scene(g_mixLevel);
+        auto scene = LevelEditorLayer::scene(g_mixLevel, false);
         CCDirector::sharedDirector()->replaceScene(
             CCTransitionFade::create(0.5f, scene)
         );
